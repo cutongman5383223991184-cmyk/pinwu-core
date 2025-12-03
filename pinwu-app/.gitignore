@@ -1,6 +1,6 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
+#.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 忽略本地开发配置
+**/application-dev.yml
+**/application-local.yml
+
+# 忽略本地测试配置 (如果有)
+**/src/test/resources/application.yml

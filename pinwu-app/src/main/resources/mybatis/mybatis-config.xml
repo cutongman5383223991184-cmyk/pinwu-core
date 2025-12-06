@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!-- 开启驼峰命名转换 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启延迟加载 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 按需加载 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 允许返回多结果集 -->
+        <setting name="multipleResultSetsEnabled" value="true"/>
+        <!-- 使用列标签 -->
+        <setting name="useColumnLabel" value="true"/>
+        <!-- 允许JDBC自动生成主键 -->
+        <setting name="useGeneratedKeys" value="true"/>
+        <!-- 日志实现 -->
+        <setting name="logImpl" value="SLF4J"/>
+    </settings>
+</configuration>

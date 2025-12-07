@@ -1,9 +1,9 @@
 package com.pinwu.app.modules.ai.controller;
 
 import com.pinwu.app.modules.ai.domain.vo.AiResultVo;
-import com.pinwu.app.modules.ai.service.QwenService;
-import com.pinwu.common.annotation.Anonymous;
-import com.pinwu.common.annotation.RateLimiter;
+import com.pinwu.app.modules.ai.service.AppAiService;
+import com.pinwu.app.modules.auth.domain.model.AppLoginUser;
+import com.pinwu.app.modules.auth.service.AppTokenService;
 import com.pinwu.common.core.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
@@ -22,33 +23,27 @@ import java.util.Map;
 public class AppAiController {
 
     @Autowired
-    private QwenService qwenService;
+    private AppAiService appAiService; // 注入新的 Service
 
-    /**
-     * 场景 A: 图片识图 (每天限 1 次)
-     * 接口地址: POST /app/ai/analyze-image
-     */
-    @Anonymous // ★ 暂时允许匿名访问，方便你调试。后续做完登录模块后删掉！
+    @Autowired
+    private AppTokenService appTokenService;
+
+    // 1. 识图 (POST)
     @PostMapping("/analyze-image")
-    // 限流：key=ai_image, 24小时(86400秒)内只能调 1 次
-    @RateLimiter(key = "ai_image", time = 86400, count = 1)
-    public AjaxResult analyzeImage(@RequestBody Map<String, String> body) {
-        String imageUrl = body.get("imageUrl");
-        AiResultVo result = qwenService.analyzeImage(imageUrl);
+    public AjaxResult analyzeImage(@RequestBody Map<String,String> params, HttpServletRequest request) {
+        String imageUrl = params.get("imageUrl");  // ✅ 从 Map 中取出 URL
+        AppLoginUser loginUser = appTokenService.getLoginUser(request);
+        // 这里把 loginUser 传进去，里面包含了 userId 和 vipExpireTime
+        AiResultVo result = appAiService.analyzeImage(imageUrl, loginUser);
         return AjaxResult.success(result);
     }
 
-    /**
-     * 场景 B: 文本润色 (每天限 3 次)
-     * 接口地址: POST /app/ai/generate-text
-     */
-    @Anonymous // ★ 暂时允许匿名访问
+    // 2. 文本生成 (POST)
     @PostMapping("/generate-text")
-    // 限流：key=ai_text, 24小时内只能调 3 次
-    @RateLimiter(key = "ai_text", time = 86400, count = 3)
-    public AjaxResult generateText(@RequestBody Map<String, String> body) {
-        String keywords = body.get("keywords");
-        AiResultVo result = qwenService.generateByKeywords(keywords);
+    public AjaxResult generateText(@RequestBody Map<String,String> params, HttpServletRequest request) {
+        String keywords = params.get("keywords");  // ✅ 从 Map 中取出关键词
+        AppLoginUser loginUser = appTokenService.getLoginUser(request);
+        AiResultVo result = appAiService.generateByKeywords(keywords, loginUser);
         return AjaxResult.success(result);
     }
 }

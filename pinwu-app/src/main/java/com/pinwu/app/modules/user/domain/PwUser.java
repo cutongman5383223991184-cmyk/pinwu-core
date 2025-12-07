@@ -41,4 +41,8 @@ public class PwUser extends BaseEntity {
     /** 最后登录时间 */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date loginDate;
+
+    /** 会员过期时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date vipExpireTime;
 }

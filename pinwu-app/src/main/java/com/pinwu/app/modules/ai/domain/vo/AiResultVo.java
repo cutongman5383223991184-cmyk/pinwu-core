@@ -27,4 +27,11 @@ public class AiResultVo {
     public void setTags(List<String> tags) { this.tags = tags; }
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public static AiResultVo mock() {
+        AiResultVo vo = new AiResultVo();
+        vo.setTitle("测试商品 - " + System.currentTimeMillis());
+        vo.setCategory("测试分类");
+        return vo;
+    }
 }

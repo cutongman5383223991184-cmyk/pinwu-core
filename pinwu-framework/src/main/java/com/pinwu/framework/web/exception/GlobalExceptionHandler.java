@@ -58,7 +58,10 @@ public class GlobalExceptionHandler
     @ExceptionHandler(ServiceException.class)
     public AjaxResult handleServiceException(ServiceException e, HttpServletRequest request)
     {
-        log.error(e.getMessage(), e);
+//        log.error(e.getMessage(), e);
+        // ✅ 改成这样（只打印消息，不打印堆栈）
+        String requestURI = request.getRequestURI();
+        log.warn("业务异常 [{}]: {}", requestURI, e.getMessage());
         Integer code = e.getCode();
         return StringUtils.isNotNull(code) ? AjaxResult.error(code, e.getMessage()) : AjaxResult.error(e.getMessage());
     }

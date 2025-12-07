@@ -12,6 +12,7 @@
         <result property="password"    column="password"    />
         <result property="avatar"      column="avatar"    />
         <result property="status"      column="status"    />
+        <result property="vipExpireTime" column="vip_expire_time"/>
         <result property="loginIp"     column="login_ip"    />
         <result property="loginDate"   column="login_date"    />
         <result property="createTime"  column="create_time"    />
@@ -19,7 +20,7 @@
     </resultMap>
 
     <sql id="selectPwUserVo">
-        select id, user_name, nickname, mobile, password, avatar, status, login_ip, login_date, create_time, update_time
+        select id, user_name, nickname, mobile, password, avatar, status, vip_expire_time, login_ip, login_date, create_time, update_time
         from pw_user
     </sql>
 

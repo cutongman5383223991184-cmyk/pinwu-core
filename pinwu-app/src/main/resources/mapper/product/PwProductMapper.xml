@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinwu.app.modules.product.mapper.PwProductMapper">
+
+    <resultMap type="com.pinwu.app.modules.product.domain.entity.PwProduct" id="PwProductResult">
+        <result property="id"    column="id"    />
+        <result property="sellerId"    column="seller_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="title"    column="title"    />
+        <result property="detail"    column="detail"    />
+        <result property="pic"    column="pic"    />
+        <result property="albumPics"    column="album_pics"    />
+        <result property="tags"    column="tags"    />
+        <result property="price"    column="price"    />
+        <result property="originalPrice"    column="original_price"    />
+
+        <result property="province"    column="province"    />
+        <result property="city"    column="city"    />
+        <result property="region"    column="region"    />
+        <result property="locationName"    column="location_name"    />
+        <result property="longitude"    column="longitude"    />
+        <result property="latitude"    column="latitude"    />
+
+        <result property="contactType"    column="contact_type"    />
+        <result property="contactValue"    column="contact_value"    />
+        <result property="viewCount"    column="view_count"    />
+        <result property="likeCount"    column="like_count"    />
+        <result property="status"    column="status"    />
+        <result property="auditStatus"    column="audit_status"    />
+        <result property="auditMsg"    column="audit_msg"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+    </resultMap>
+
+    <sql id="selectPwProductVo">
+        select id, seller_id, category_id, title, detail, pic, album_pics, tags, price, original_price,
+               province, city, region, location_name, longitude, latitude,
+               contact_type, contact_value, view_count, like_count, status, audit_status, audit_msg, del_flag, create_time, update_time
+        from pw_product
+    </sql>
+
+    <select id="selectPwProductList" parameterType="com.pinwu.app.modules.product.domain.entity.PwProduct" resultMap="PwProductResult">
+        <include refid="selectPwProductVo"/>
+        <where>
+            <if test="title != null  and title != ''"> and title like concat('%', #{title}, '%')</if>
+            <if test="status != null "> and status = #{status}</if>
+            <if test="sellerId != null "> and seller_id = #{sellerId}</if>
+        </where>
+    </select>
+
+    <select id="selectPwProductById" parameterType="long" resultMap="PwProductResult">
+        <include refid="selectPwProductVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPwProduct" parameterType="com.pinwu.app.modules.product.domain.entity.PwProduct" useGeneratedKeys="true" keyProperty="id">
+        insert into pw_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sellerId != null">seller_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="detail != null and detail != ''">detail,</if>
+            <if test="pic != null and pic != ''">pic,</if>
+            <if test="albumPics != null">album_pics,</if>
+            <if test="tags != null">tags,</if>
+            <if test="price != null">price,</if>
+            <if test="originalPrice != null">original_price,</if>
+
+            <if test="province != null">province,</if>
+            <if test="city != null">city,</if>
+            <if test="region != null">region,</if>
+            <if test="locationName != null">location_name,</if>
+            <if test="longitude != null">longitude,</if>
+            <if test="latitude != null">latitude,</if>
+
+            <if test="contactType != null">contact_type,</if>
+            <if test="contactValue != null">contact_value,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="status != null">status,</if>
+            <if test="auditStatus != null">audit_status,</if>
+            <if test="auditMsg != null">audit_msg,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sellerId != null">#{sellerId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="detail != null and detail != ''">#{detail},</if>
+            <if test="pic != null and pic != ''">#{pic},</if>
+            <if test="albumPics != null">#{albumPics},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="price != null">#{price},</if>
+            <if test="originalPrice != null">#{originalPrice},</if>
+
+            <if test="province != null">#{province},</if>
+            <if test="city != null">#{city},</if>
+            <if test="region != null">#{region},</if>
+            <if test="locationName != null">#{locationName},</if>
+            <if test="longitude != null">#{longitude},</if>
+            <if test="latitude != null">#{latitude},</if>
+
+            <if test="contactType != null">#{contactType},</if>
+            <if test="contactValue != null">#{contactValue},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="status != null">#{status},</if>
+            <if test="auditStatus != null">#{auditStatus},</if>
+            <if test="auditMsg != null">#{auditMsg},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePwProduct" parameterType="com.pinwu.app.modules.product.domain.entity.PwProduct">
+        update pw_product
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="sellerId != null">seller_id = #{sellerId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="detail != null and detail != ''">detail = #{detail},</if>
+            <if test="pic != null and pic != ''">pic = #{pic},</if>
+            <if test="albumPics != null">album_pics = #{albumPics},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="originalPrice != null">original_price = #{originalPrice},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="region != null">region = #{region},</if>
+            <if test="locationName != null">location_name = #{locationName},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="contactType != null">contact_type = #{contactType},</if>
+            <if test="contactValue != null">contact_value = #{contactValue},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="auditStatus != null">audit_status = #{auditStatus},</if>
+            <if test="auditMsg != null">audit_msg = #{auditMsg},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePwProductByIds" parameterType="string">
+        update pw_product set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

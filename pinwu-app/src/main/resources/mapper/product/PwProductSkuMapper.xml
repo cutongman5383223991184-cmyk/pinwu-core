@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinwu.app.modules.product.mapper.PwProductSkuMapper">
+
+    <resultMap type="com.pinwu.app.modules.product.domain.entity.PwProductSku" id="PwProductSkuResult">
+        <result property="id"    column="id"    />
+        <result property="productId"    column="product_id"    />
+        <result property="skuName"    column="sku_name"    />
+        <result property="skuPic"    column="sku_pic"    />
+        <result property="price"    column="price"    />
+        <result property="stock"    column="stock"    />
+        <result property="version"    column="version"    />
+    </resultMap>
+
+    <insert id="insertBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="id">
+        insert into pw_product_sku (product_id, sku_name, sku_pic, price, stock, version)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.productId}, #{item.skuName}, #{item.skuPic}, #{item.price}, #{item.stock}, 0)
+        </foreach>
+    </insert>
+
+    <select id="selectSkuByProductId" resultMap="PwProductSkuResult">
+        select * from pw_product_sku where product_id = #{productId}
+    </select>
+</mapper>

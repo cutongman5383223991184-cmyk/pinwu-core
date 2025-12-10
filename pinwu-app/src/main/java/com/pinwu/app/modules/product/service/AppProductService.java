@@ -6,8 +6,11 @@ import cn.hutool.json.JSONUtil;
 import com.pinwu.app.modules.product.domain.doc.ProductDoc;
 import com.pinwu.app.modules.product.domain.dto.ProductPublishDto;
 import com.pinwu.app.modules.product.domain.dto.ProductSearchQuery;
+import com.pinwu.app.modules.product.domain.dto.ProductSkuDto;
 import com.pinwu.app.modules.product.domain.entity.PwProduct; // 你的MySQL实体
+import com.pinwu.app.modules.product.domain.entity.PwProductSku;
 import com.pinwu.app.modules.product.mapper.PwProductMapper;
+import com.pinwu.app.modules.product.mapper.PwProductSkuMapper;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
 import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction;
 import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
@@ -28,6 +31,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +41,9 @@ public class AppProductService {
 
     @Autowired
     private PwProductMapper productMapper;
+
+    @Autowired
+    private PwProductSkuMapper skuMapper;
 
     @Autowired
     private ElasticsearchRestTemplate esTemplate;
@@ -61,7 +68,34 @@ public class AppProductService {
         // 这里的 insert 必须返回主键 ID，检查你的 XML 配置 useGeneratedKeys="true"
         productMapper.insertPwProduct(product);
 
-        // 1.2 存入 ES
+        // 1.2 自动生成默认 SKU (C2C 默认单规格)
+        List<PwProductSku> skuEntityList = new ArrayList<>();
+
+        if (dto.getSkuList() != null && !dto.getSkuList().isEmpty()) {
+            // 情况 A: 多规格 (如二手书: 高数, 英语)
+            for (ProductSkuDto skuDto : dto.getSkuList()) {
+                PwProductSku sku = new PwProductSku();
+                BeanUtil.copyProperties(skuDto, sku);
+                sku.setProductId(product.getId()); // ★ 关联主表ID
+                if (sku.getStock() == null) sku.setStock(1); // 默认库存1
+                skuEntityList.add(sku);
+            }
+        } else {
+            // 情况 B: 单规格 (如二手手机) - 自动生成一个默认SKU
+            // 这一步非常重要！统一了后续的订单逻辑，所有订单都指向SKU。
+            PwProductSku defaultSku = new PwProductSku();
+            defaultSku.setProductId(product.getId());
+            defaultSku.setSkuName("默认"); // 或者用商品标题
+            defaultSku.setPrice(product.getPrice());
+            defaultSku.setStock(1); // 默认1件
+            defaultSku.setSkuPic(product.getPic());
+            skuEntityList.add(defaultSku);
+        }
+
+        // 批量插入子表
+        skuMapper.insertBatch(skuEntityList);
+
+        // 1.3 存入 ES
         ProductDoc doc = new ProductDoc();
         // 拷贝基础属性
         BeanUtil.copyProperties(dto, doc);
@@ -88,7 +122,11 @@ public class AppProductService {
 
         if (StrUtil.isNotBlank(query.getKeyword())) {
             // 关键词匹配 (至少匹配70%的内容)
-            boolQuery.must(QueryBuilders.matchQuery("title", query.getKeyword()).minimumShouldMatch("70%"));
+            boolQuery.must(QueryBuilders.multiMatchQuery(query.getKeyword())
+                    .field("title", 2.0f) // ★ 显式设置权重 boost = 2.0
+                    .field("detail")      // 默认权重 1.0
+                    .field("tags")        // 默认权重 1.0
+                    .minimumShouldMatch("70%"));
         }
 
         NativeSearchQueryBuilder queryBuilder = new NativeSearchQueryBuilder();

@@ -47,4 +47,9 @@ public class ProductPublishDto {
 
     private Integer contactType; // 0-手机 1-微信
     private String contactValue;
+
+    /** * ★ 新增：规格列表
+     * 如果是单品(如手机)，前端可以不传这个，后端自动生成一个默认SKU
+     */
+    private List<ProductSkuDto> skuList;
 }

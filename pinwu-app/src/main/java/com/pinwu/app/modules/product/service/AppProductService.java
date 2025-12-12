@@ -1,6 +1,7 @@
 package com.pinwu.app.modules.product.service;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.pinwu.app.modules.product.domain.doc.ProductDoc;
@@ -9,8 +10,13 @@ import com.pinwu.app.modules.product.domain.dto.ProductSearchQuery;
 import com.pinwu.app.modules.product.domain.dto.ProductSkuDto;
 import com.pinwu.app.modules.product.domain.entity.PwProduct; // 你的MySQL实体
 import com.pinwu.app.modules.product.domain.entity.PwProductSku;
+import com.pinwu.app.modules.product.domain.vo.ProductDetailVo;
 import com.pinwu.app.modules.product.mapper.PwProductMapper;
 import com.pinwu.app.modules.product.mapper.PwProductSkuMapper;
+import com.pinwu.app.modules.user.domain.PwUser;
+import com.pinwu.app.modules.user.mapper.PwUserMapper;
+import com.pinwu.common.core.redis.RedisCache;
+import com.pinwu.common.exception.ServiceException;
 import org.elasticsearch.common.lucene.search.function.CombineFunction;
 import org.elasticsearch.common.lucene.search.function.FieldValueFactorFunction;
 import org.elasticsearch.common.lucene.search.function.FunctionScoreQuery;
@@ -34,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +54,12 @@ public class AppProductService {
 
     @Autowired
     private ElasticsearchRestTemplate esTemplate;
+
+
+    @Autowired
+    private RedisCache redisCache;
+    @Autowired
+    private PwUserMapper userMapper; // 需要查卖家
 
     /**
      * 1. 发布商品 (MySQL + ES 双写)
@@ -192,5 +205,99 @@ public class AppProductService {
         SearchHits<ProductDoc> searchHits = esTemplate.search(searchQuery, ProductDoc.class);
 
         return searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+    }
+
+
+    /**
+     * 获取商品详情 (高并发 + 隐私脱敏)
+     */
+    public ProductDetailVo getDetail(Long id) {
+        String cacheKey = "product:detail:" + id;
+
+        // 1. 查 Redis 缓存
+        ProductDetailVo vo = redisCache.getCacheObject(cacheKey);
+        if (vo != null) {
+            // ★ 异步增加浏览量 (面试加分项: 不直接刷库，先刷Redis，定时任务同步DB)
+            redisCache.redisTemplate.opsForValue().increment("product:view:" + id);
+            return vo;
+        }
+
+        // 2. 查 MySQL 主表 (SPU)
+        PwProduct product = productMapper.selectPwProductById(id);
+        if (product == null) {
+            return null; // 商品不存在
+        }
+
+        // 3. 组装 VO
+        vo = new ProductDetailVo();
+        BeanUtil.copyProperties(product, vo);
+
+        // 处理 Tags (JSON String -> List)
+        if (StrUtil.isNotBlank(product.getTags())) {
+            vo.setTags(JSONUtil.toList(product.getTags(), String.class));
+        }
+
+        // 4. 查 SKU 子表
+        List<PwProductSku> skus = skuMapper.selectSkuByProductId(id);
+        vo.setSkuList(skus);
+
+        // 5. 查卖家信息 & 脱敏 (Privacy)
+        PwUser seller = userMapper.selectPwUserById(product.getSellerId());
+        if (seller != null) {
+            ProductDetailVo.SellerVo sellerVo = new ProductDetailVo.SellerVo();
+            sellerVo.setUserId(seller.getId());
+            sellerVo.setNickname(seller.getNickname());
+            sellerVo.setAvatar(seller.getAvatar());
+            // 简单处理活跃时间
+            sellerVo.setActiveTimeText("近期活跃");
+
+            // ★★★ 核心隐私保护：脱敏联系方式 ★★★
+            // 即使缓存泄露，拿到的也是 138****1234
+            sellerVo.setContactType(product.getContactType());
+            if (StrUtil.isNotBlank(product.getContactValue())) {
+                // 如果是手机号 (contactType=0)，进行脱敏
+                if (product.getContactType() != null && product.getContactType() == 0) {
+                    sellerVo.setContactValue(DesensitizedUtil.mobilePhone(product.getContactValue()));
+                } else {
+                    // 微信号也稍微遮一下
+                    sellerVo.setContactValue(StrUtil.hide(product.getContactValue(), 1, 3));
+                }
+            }
+            vo.setSeller(sellerVo);
+        }
+
+        // 6. 回写 Redis (设置1小时过期，防止冷门商品长期占用内存)
+        redisCache.setCacheObject(cacheKey, vo, 1, TimeUnit.HOURS);
+
+        return vo;
+    }
+
+    /**
+     * 获取真实联系方式 (需鉴权 + 风控)
+     */
+    public String getContact(Long productId, Long userId) {
+        // 1. 查数据库 (不查缓存，确保实时和安全)
+        PwProduct product = productMapper.selectPwProductById(productId);
+        if (product == null) {
+            throw new ServiceException("商品不存在");
+        }
+
+        // 2. 简单的风控 (Redis计数)
+        // Key: risk:contact:uid:1001:20251210
+        String date = cn.hutool.core.date.DateUtil.format(new Date(), "yyyyMMdd");
+        String riskKey = "risk:contact:uid:" + userId + ":" + date;
+
+        long count = redisCache.redisTemplate.opsForValue().increment(riskKey);
+        if (count == 1) {
+            redisCache.expire(riskKey, 1, TimeUnit.DAYS);
+        }
+
+        // 限制每天只能看 10 个不同商品的电话
+        if (count > 10) {
+            throw new ServiceException("今日查看次数已达上限，请明天再来");
+        }
+
+        // 3. 返回真实数据
+        return product.getContactValue();
     }
 }

@@ -5,6 +5,7 @@ import com.pinwu.app.modules.auth.service.AppTokenService;
 import com.pinwu.app.modules.product.domain.doc.ProductDoc;
 import com.pinwu.app.modules.product.domain.dto.ProductPublishDto;
 import com.pinwu.app.modules.product.domain.dto.ProductSearchQuery;
+import com.pinwu.app.modules.product.domain.vo.ProductDetailVo;
 import com.pinwu.app.modules.product.service.AppProductService;
 import com.pinwu.common.core.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,35 @@ public class AppProductController {
         
         List<ProductDoc> list = productService.search(query);
         return AjaxResult.success(list);
+    }
+
+    /**
+     * 商品详情 (公开接口)
+     */
+    @GetMapping("/detail/{id}")
+    public AjaxResult detail(@PathVariable Long id) {
+        ProductDetailVo vo = productService.getDetail(id);
+        if (vo == null) {
+            return AjaxResult.error(404, "商品不存在或已下架");
+        }
+        return AjaxResult.success(vo);
+    }
+
+    /**
+     * 获取卖家联系方式 (必须登录)
+     */
+    @GetMapping("/contact/{id}")
+    public AjaxResult getContact(@PathVariable Long id, HttpServletRequest request) {
+        // 1. 严格鉴权
+        AppLoginUser loginUser = tokenService.getLoginUser(request);
+        if (loginUser == null) {
+            return AjaxResult.error(401, "请先登录后查看联系方式");
+        }
+
+        // 2. 调用业务
+        String contact = productService.getContact(id, loginUser.getPwUser().getId());
+
+        // 3. 返回
+        return AjaxResult.success("获取成功", contact);
     }
 }

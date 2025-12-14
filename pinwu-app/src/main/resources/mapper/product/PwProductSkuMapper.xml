@@ -25,4 +25,16 @@
     <select id="selectSkuByProductId" resultMap="PwProductSkuResult">
         select * from pw_product_sku where product_id = #{productId}
     </select>
+
+    <select id="selectPwProductSkuById" resultMap="PwProductSkuResult">
+        select * from pw_product_sku where id = #{id}
+    </select>
+
+    <update id="deductStock">
+        update pw_product_sku
+        set stock = stock - #{count},
+            version = version + 1
+        where id = #{skuId}
+          and stock >= #{count}
+    </update>
 </mapper>

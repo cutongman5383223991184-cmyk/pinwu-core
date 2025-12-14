@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinwu.app.modules.order.mapper.PwOrderItemMapper">
+
+    <resultMap type="com.pinwu.app.modules.order.domain.entity.PwOrderItem" id="PwOrderItemResult">
+        <result property="id"    column="id"    />
+        <result property="orderId"    column="order_id"    />
+        <result property="orderNo"    column="order_no"    />
+        <result property="productId"    column="product_id"    />
+        <result property="skuId"    column="sku_id"    />
+        <result property="productName"    column="product_name"    />
+        <result property="productPic"    column="product_pic"    />
+        <result property="skuName"    column="sku_name"    />
+        <result property="productPrice"    column="product_price"    />
+        <result property="buyCount"    column="buy_count"    />
+    </resultMap>
+
+    <insert id="insertPwOrderItem" parameterType="com.pinwu.app.modules.order.domain.entity.PwOrderItem">
+        insert into pw_order_item(order_id, order_no, product_id, sku_id, product_name, product_pic, sku_name, product_price, buy_count)
+        values(#{orderId}, #{orderNo}, #{productId}, #{skuId}, #{productName}, #{productPic}, #{skuName}, #{productPrice}, #{buyCount})
+    </insert>
+
+    <select id="selectItemsByOrderNo" resultMap="PwOrderItemResult">
+        select * from pw_order_item where order_no = #{orderNo}
+    </select>
+
+</mapper>

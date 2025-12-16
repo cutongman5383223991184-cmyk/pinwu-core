@@ -23,6 +23,22 @@
 		{
 			"path": "pages/my/my",
 			"style": { "navigationBarTitleText": "个人中心", "navigationStyle": "custom" }
+		},
+		{
+			"path": "pages/detail/detail",
+			"style": {
+				"navigationBarTitleText": "商品详情",
+				"navigationBarBackgroundColor": "#ffffff",
+				"navigationBarTextStyle": "black"
+			}
+		},
+		{
+			"path": "pages/order/confirm",
+			"style": {
+                "navigationBarTitleText": "确认订单",
+                "navigationBarBackgroundColor": "#ffffff",
+                "navigationBarTextStyle": "black"
+            }
 		}
 	],
 	"globalStyle": {

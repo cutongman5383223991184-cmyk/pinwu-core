@@ -65,8 +65,7 @@ const loadData = async () => {
 
 // 跳转详情页 (等会儿再写详情页)
 const goDetail = (id) => {
-  uni.showToast({ title: '点击了商品ID: ' + id, icon: 'none' });
-  // uni.navigateTo({ url: '/pages/detail/detail?id=' + id });
+  uni.navigateTo({ url: '/pages/detail/detail?id=' + id });
 };
 
 // 页面加载时触发

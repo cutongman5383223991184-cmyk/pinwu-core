@@ -8,7 +8,7 @@
     /* H5 特有相关 */
     "h5" : {
         "devServer" : {
-            "port" : 8080,
+            "port" : 5300,
             "disableHostCheck" : true
         },
         "sdkConfigs" : {

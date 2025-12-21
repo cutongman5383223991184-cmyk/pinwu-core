@@ -1,6 +1,6 @@
 package com.pinwu.app.modules.user.mapper;
 
-import com.pinwu.app.modules.user.domain.PwUser;
+import com.pinwu.common.core.domain.entity.PwUser;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

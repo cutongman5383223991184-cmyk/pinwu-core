@@ -1,7 +1,7 @@
-package com.pinwu.app.modules.auth.domain.model;
+package com.pinwu.common.core.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pinwu.app.modules.user.domain.PwUser; // 引用你的 App 用户实体
+import com.pinwu.common.core.domain.entity.PwUser;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

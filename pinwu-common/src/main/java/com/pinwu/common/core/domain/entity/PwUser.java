@@ -1,4 +1,4 @@
-package com.pinwu.app.modules.user.domain;
+package com.pinwu.common.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pinwu.common.core.domain.BaseEntity;

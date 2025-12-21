@@ -112,7 +112,11 @@ public class SecurityConfig
                 permitAllUrl.getUrls().forEach(url -> requests.antMatchers(url).permitAll());
                 // 对于登录login 注册register 验证码captchaImage 允许匿名访问
                 requests.antMatchers("/login", "/register", "/captchaImage").permitAll()
-                        .antMatchers("/app/**").permitAll()
+                        //.antMatchers("/app/**").permitAll()
+                        // 允许不登录就：发验证码、登录、注册
+                        .antMatchers("/app/auth/login", "/app/auth/register", "/app/auth/sendCode").permitAll()
+                        // 允许不登录就：看商品列表、看商品详情、看首页
+                        .antMatchers("/app/product/list", "/app/product/search", "/app/product/detail/**").permitAll()
                     // 静态资源，可匿名访问
                     .antMatchers(HttpMethod.GET, "/", "/*.html", "/**/*.html", "/**/*.css", "/**/*.js", "/profile/**").permitAll()
                     .antMatchers("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()

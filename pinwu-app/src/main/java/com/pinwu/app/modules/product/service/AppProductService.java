@@ -13,7 +13,7 @@ import com.pinwu.app.modules.product.domain.entity.PwProductSku;
 import com.pinwu.app.modules.product.domain.vo.ProductDetailVo;
 import com.pinwu.app.modules.product.mapper.PwProductMapper;
 import com.pinwu.app.modules.product.mapper.PwProductSkuMapper;
-import com.pinwu.app.modules.user.domain.PwUser;
+import com.pinwu.common.core.domain.entity.PwUser;
 import com.pinwu.app.modules.user.mapper.PwUserMapper;
 import com.pinwu.common.core.redis.RedisCache;
 import com.pinwu.common.exception.ServiceException;

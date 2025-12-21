@@ -1,9 +1,9 @@
 package com.pinwu.app.modules.auth.controller;
 
-import com.pinwu.app.modules.auth.domain.model.AppLoginUser;
+import com.pinwu.common.core.domain.model.AppLoginUser;
 import com.pinwu.app.modules.auth.domain.vo.AppLoginBody;
 import com.pinwu.app.modules.auth.service.AppAuthService;
-import com.pinwu.app.modules.auth.service.AppTokenService;
+import com.pinwu.framework.web.service.AppTokenService;
 import com.pinwu.common.core.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

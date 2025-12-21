@@ -5,6 +5,21 @@
     "versionName" : "1.0.0",
     "versionCode" : "100",
     "transformPx" : false,
+    /* H5 特有相关 */
+    "h5" : {
+        "devServer" : {
+            "port" : 8080,
+            "disableHostCheck" : true
+        },
+        "sdkConfigs" : {
+            "maps" : {
+                "amap" : {
+                    "key" : "YOUR_AMAP_KEY_HERE", 
+                    "securityJsCode": "YOUR_SECURITY_JS_CODE_HERE" 
+                }
+            }
+        }
+    },
     /* 5+App特有相关 */
     "app-plus" : {
         "usingComponents" : true,
@@ -17,7 +32,9 @@
             "delay" : 0
         },
         /* 模块配置 */
-        "modules" : {},
+        "modules" : {
+            "Maps" : {}
+        },
         /* 应用发布信息 */
         "distribute" : {
             /* android打包配置 */
@@ -43,7 +60,15 @@
             /* ios打包配置 */
             "ios" : {},
             /* SDK配置 */
-            "sdkConfigs" : {}
+            "sdkConfigs" : {
+                /* 2. 在这里配置高德 App 端的 Key */
+                "maps" : {
+                    "amap" : {
+                        "androidkey" : "YOUR_AMAP_KEY_HERE",
+                        "ioskey" : "YOUR_AMAP_KEY_HERE"
+                    }
+                }
+            }
         }
     },
     /* 快应用特有相关 */

@@ -3,14 +3,15 @@ package com.pinwu.app.modules.auth.service;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.digest.BCrypt;
-import com.pinwu.app.modules.auth.domain.model.AppLoginUser; // ★ 引用新的 User
+import com.pinwu.common.core.domain.model.AppLoginUser; // ★ 引用新的 User
 import com.pinwu.app.modules.auth.domain.vo.AppLoginBody;
-import com.pinwu.app.modules.user.domain.PwUser;
+import com.pinwu.common.core.domain.entity.PwUser;
 import com.pinwu.app.modules.user.mapper.PwUserMapper;
 import com.pinwu.common.core.redis.RedisCache;
 import com.pinwu.common.exception.ServiceException;
 import com.pinwu.common.utils.DateUtils;
 import com.pinwu.common.utils.StringUtils;
+import com.pinwu.framework.web.service.AppTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

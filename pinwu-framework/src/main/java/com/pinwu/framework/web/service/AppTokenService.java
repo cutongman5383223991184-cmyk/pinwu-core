@@ -1,7 +1,8 @@
-package com.pinwu.app.modules.auth.service;
+package com.pinwu.framework.web.service;
 
-import com.pinwu.app.modules.auth.domain.model.AppLoginUser;
+
 import com.pinwu.common.constant.Constants;
+import com.pinwu.common.core.domain.model.AppLoginUser;
 import com.pinwu.common.core.redis.RedisCache;
 import com.pinwu.common.utils.uuid.IdUtils;
 import com.pinwu.common.utils.StringUtils;
@@ -107,6 +108,19 @@ public class AppTokenService {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    /**
+     * 验证令牌有效期，相差不足20分钟，自动刷新缓存
+     * ✅ 新增这个方法
+     */
+    public void verifyToken(AppLoginUser loginUser) {
+        long expireTime = loginUser.getExpireTime();
+        long currentTime = System.currentTimeMillis();
+
+        if (expireTime - currentTime <= MILLIS_MINUTE_TEN) {
+            refreshToken(loginUser);
+        }
     }
 
     /**

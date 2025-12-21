@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pinwu.app.modules.user.mapper.PwUserMapper">
 
-    <resultMap type="com.pinwu.app.modules.user.domain.PwUser" id="PwUserResult">
+    <resultMap type="com.pinwu.common.core.domain.entity.PwUser" id="PwUserResult">
         <result property="id"          column="id"    />
         <result property="userName"    column="user_name"    />
         <result property="nickname"    column="nickname"    />
@@ -34,7 +34,7 @@
         where id = #{id}
     </select>
 
-    <insert id="insertPwUser" parameterType="com.pinwu.app.modules.user.domain.PwUser" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertPwUser" parameterType="com.pinwu.common.core.domain.entity.PwUser" useGeneratedKeys="true" keyProperty="id">
         insert into pw_user
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="userName != null">user_name,</if>
@@ -56,7 +56,7 @@
         </trim>
     </insert>
 
-    <update id="updatePwUser" parameterType="com.pinwu.app.modules.user.domain.PwUser">
+    <update id="updatePwUser" parameterType="com.pinwu.common.core.domain.entity.PwUser">
         update pw_user
         <trim prefix="SET" suffixOverrides=",">
             <if test="nickname != null">nickname = #{nickname},</if>

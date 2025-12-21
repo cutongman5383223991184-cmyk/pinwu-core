@@ -2,8 +2,8 @@ package com.pinwu.app.modules.ai.controller;
 
 import com.pinwu.app.modules.ai.domain.vo.AiResultVo;
 import com.pinwu.app.modules.ai.service.AppAiService;
-import com.pinwu.app.modules.auth.domain.model.AppLoginUser;
-import com.pinwu.app.modules.auth.service.AppTokenService;
+import com.pinwu.common.core.domain.model.AppLoginUser;
+import com.pinwu.framework.web.service.AppTokenService;
 import com.pinwu.common.core.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
